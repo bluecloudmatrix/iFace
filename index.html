@@ -1,0 +1,603 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<!--<meta http-equiv="Expires" content="0">
+		<meta http-equiv="kiben" content="no-cache">-->
+			<!-- FaceMatrix.js must be first of FaceMatrix-->
+		<script type="text/javascript" src="js/FaceMatrix/FaceMatrix.js"></script>	
+		
+		<script type="text/javascript" src="js/FaceMatrix/toMaze/mouth/mouthDetect.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/toMaze/mouth/getAimLBPHist.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/toMaze/mouth/LBPHist.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/toMaze/mouth/drawHists.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/toMaze/mouth/compareWithNormLBP.js"></script>
+		
+		<script type="text/javascript" src="js/FaceMatrix/eyedetect/eye_cascade.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/eyedetect/haarDetect.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/eyedetect/eyedetect.js"></script>	
+		
+		<script type="text/javascript" src="js/FaceMatrix/facedetect/face.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/facedetect/ccv.js"></script>	
+		
+		<script type="text/javascript" src="js/FaceMatrix/faceEdge/getFaceEdge.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/faceEdge/locateEyeMouthForDetect.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/faceEdge/faceOval/BezierEllipse.js"></script>
+		
+		<script type="text/javascript" src="js/FaceMatrix/func/requestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/func/binary.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/func/gray.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/func/copyCanvas.js"></script>
+		
+		<script type="text/javascript" src="js/FaceMatrix/extract/extractFace.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/extract/reloadPic.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/extract/eye2back.js"></script>
+		<script type="text/javascript" src="js/FaceMatrix/extract/mouth2music.js"></script>
+			
+		<script type="text/javascript" src="js/libs/jsfeat-min.js"></script>
+		<script type="text/javascript" src="js/libs/jquery.min.js"></script>
+		<script type="text/javascript" src="js/libs/three49.js"></script>
+
+		<script type="text/javascript" src="js/tools/THREEx.FullScreen.js"></script>
+		<script type="text/javascript" src="js/tools/THREEx.WindowResize.js"></script>
+		
+		<script type="text/javascript" src="js/publicJs/button.js"></script>
+		<script type="text/javascript" src="js/publicJs/button_change.js"></script>
+			
+		<!-- 3D Scene Building -->
+		
+		<script type="text/javascript" src="js/gameView/3DScene/webgl/buildings.js"></script>
+		<script type="text/javascript" src="js/gameView/3DScene/webgl/to3d.js"></script>
+		<script type="text/javascript" src="js/gameView/3DScene/ammo.js"></script>
+		<script type="text/javascript" src="js/gameView/3DScene/physijs_worker.js"></script>
+		<script type="text/javascript" src="js/gameView/3DScene/physi.js"></script>
+		
+		<script type="text/javascript" src="js/gameView/gameView.js"></script>
+		<script type="text/javascript" src="js/gameView/faceControl/App.js"></script>
+		<script type="text/javascript" src="js/gameView/faceControl/faceTriggerClosure.js"></script>
+		<script type="text/javascript" src="js/gameView/faceControl/faceTriggerSecond.js"></script>
+		<script type="text/javascript" src="js/gameView/faceControl/faceTriggerThird.js"></script>
+		
+		<script type="text/javascript" src="js/gameView/headtrackr/main.js"></script>
+		<script type="text/javascript" src="js/gameView/headtrackr/ccv.js"></script>
+		<script type="text/javascript" src="js/gameView/headtrackr/cascade.js"></script>
+		<script type="text/javascript" src="js/gameView/headtrackr/whitebalance.js"></script>
+		<script type="text/javascript" src="js/gameView/headtrackr/facetrackr.js"></script>
+		<script type="text/javascript" src="js/gameView/headtrackr/headposition.js"></script>
+		<script type="text/javascript" src="js/gameView/headtrackr/ui.js"></script>
+		<script type="text/javascript" src="js/gameView/headtrackr/smoother.js"></script>
+		<script type="text/javascript" src="js/gameView/headtrackr/camshift.js"></script>
+
+		<!-- the entrance of the game-->
+		<script type="text/javascript" src="js/takephoto/takephoto.js"></script>
+		
+		<script type="text/javascript" src="js/websocket/websocket.js"></script>
+		
+		
+		<script type="text/javascript" src="js/libs/webRTCServer.js"></script>
+		<script type="text/javascript" src="js/libs/json2.js"></script>
+		<script type="text/javascript" src="js/libs/jquery.qrcode.min.js"></script>
+		<script type="text/javascript" src="js/libs/lufy.js"></script>
+	<style>
+			body {
+				background-color: #326696;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+				text-align:center;
+			}
+	
+			#vcanvas {
+				width: auto;
+				height: 100%;
+				background: black;
+				-webkit-transform: scale(-1, 1);
+			}
+			
+			#output {
+				width: auto;
+				height: 100%;
+				-webkit-transform: scale(-1, 1);
+			}
+			
+			#boundary {
+				width: auto;
+				height: 100%;
+				background: black;
+				-webkit-transform: scale(-1, 1);
+			}
+			
+			#oval {
+				width: auto;
+				height: 100%;
+				-webkit-transform: scale(-1, 1);
+			}
+			
+			#finalCanvas {
+				width: auto;
+				height: 100%;
+				background: black;
+				-webkit-transform: scale(-1, 1);
+			}
+			
+			#control {
+				width: 320;
+				height: 240;
+				position: absolute;
+				left: 50%;
+				margin-left: -160px;
+				top:50%;
+				margin-top: -120px;	
+				-webkit-transform: scale(-1, 1);
+			} 
+
+		</style>	
+
+		<!-- city day and night -->
+		
+		<style>
+			body {margin:0; padding:0; background-color:#ddf5f7;}
+			/*-------- 天空背景以及动画 --------*/
+			.stage {
+				position: relative;
+				overflow: hidden;
+				height: 800px;
+				background: #350847;
+				z-index: -1;
+			}
+			
+			/*-------- 天黑场景遮罩层以及动画 --------*/
+			.nightOverlay {
+				z-index: 9999;
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: rgba(15, 25, 44, 0.7);
+				opacity: 0;
+	
+			}
+			/*-------- 太阳自转以及动画 --------*/
+			.sun, .moon {
+				position: absolute;
+				height: 145px;
+				width: 145px;
+				-webkit-border-radius: 50%;
+				-moz-border-radius: 50%;
+				-ms-border-radius: 50%;
+				-o-border-radius: 50%;
+				border-radius: 50%;
+			}
+			.sun {
+				top: 0;
+				left: 0;
+				background: yellow;
+			}
+			.moon {
+				bottom: 0;
+				right: 0;
+				background: black;
+			}
+			/*-------- 云以及动画 --------*/
+			.cloud {
+				position: absolute;
+			}
+			.cloud.small {
+				z-index: 1;
+				top: 5%;
+				left: 15%;
+				background: url(images/cloudSmall.png) no-repeat no-repeat center;
+				height: 50px;
+				width: 89px;
+			}
+			.cloud.medium {
+				z-index: 3;
+				top: 25%;
+				left: 30%;
+				background: url(images/cloudMedium.png) no-repeat no-repeat center;
+				height: 92px;
+				width: 159px;
+			}
+			.cloud.large {
+				z-index: 2;
+				top: 5%;
+				right: 15%;
+				background: url(images/cloudLarge.png) no-repeat no-repeat center;
+				height: 169px;
+				width: 302px;
+			}
+			
+			/*-------- 气球以及动画 --------*/
+					.balloon {
+				position: absolute;
+				z-index: 3;
+				top: 5%;
+				right: 20%;
+				background: url(images/balloon.png) no-repeat no-repeat center;
+				height: 227px;
+				width: 157px;
+			}
+			/*-------- 场景组件 --------*/
+			.skyline {
+				position: absolute;
+				z-index: 5;
+				width: 100%;
+				bottom: 26%;
+				background: url(images/skyline.png) repeat no-repeat;
+				height: 147px;
+			}
+			.beans {
+				position: absolute;
+				z-index: 4;
+				height: 201px;
+				width: 88px;
+				bottom: 30%;
+				left: 50%;
+				background: url(images/beans.png) no-repeat no-repeat;
+			}
+			.ground {
+				position: absolute;
+				width: 100%;
+				bottom: 0;
+			}
+			.ground.front {
+				z-index: 30;
+				background: url(images/groundFront.png) repeat no-repeat center;
+				height: 301px;
+			}
+			.ground.mid {
+				z-index: 20;
+				background: url(images/groundMid.png) repeat no-repeat;
+				height: 299px;
+			}
+			.ground.back {
+				z-index: 10;
+				background: url(images/groundBack.png) repeat no-repeat center;
+				height: 281px;
+			}
+			.dowEventCenter {
+				position: absolute;
+				z-index: 12;
+				bottom: 20%;
+				left: 5%;
+				background: url(images/dowEventCenter.png) no-repeat no-repeat center;
+				height: 236px;
+				width: 524px;
+			}
+			.planetarium {
+				position: absolute;
+				z-index: 12;
+				bottom: 18%;
+				right: 10%;
+				background: url(images/Planetarium.png) no-repeat no-repeat center;
+				height: 285px;
+				width: 347px;
+			}
+			.friendshipShell {
+				position: absolute;
+				z-index: 21;
+				bottom: 18%;
+				left: 20%;
+				background: url(images/friendshipShell.png) no-repeat no-repeat center;
+				height: 370px;
+				width: 231px;
+			}
+			.glockenspiel {
+				position: absolute;
+				z-index: 11;
+				bottom: 26%;
+				right: 50%;
+				background: url(images/Glockenspiel.png) no-repeat no-repeat center;
+				height: 263px;
+				width: 137px;
+			}
+
+			.title {background-color:rgba(231,112,62,0.56); width:100%; position:fixed; top:0; left:0; font-size:12px; font-family:Verdana, Geneva, sans-serif; z-index:99999;}
+			.title a {color:#FFF; text-decoration:none; line-height:24px; padding:0 10px; letter-spacing: 1px;}
+			.title_r {float:right;}
+			.title_l {float:left;}
+			.title a:hover {background:#792e0e;}
+			.footer {text-align:center;}
+			.footer a {color:#CB653C; text-decoration:none; font-family:Verdana, Geneva, sans-serif; font-size:12px;}
+			
+			.circle {
+		background-color: rgba(0,0,0,0);
+		border:5px solid rgba(0,183,229,0.9);
+		opacity:.9;
+		border-right:5px solid rgba(0,0,0,0);
+		border-left:5px solid rgba(0,0,0,0);
+		border-radius:50px;
+		box-shadow: 0 0 35px #2187e7;
+		width:50px;
+		height:50px;
+		margin:0 auto;
+		-moz-animation:spinPulse 1s infinite ease-in-out;
+		-webkit-animation:spinPulse 1s infinite linear;
+	}
+	.circle1 {
+		background-color: rgba(0,0,0,0);
+		border:5px solid rgba(0,183,229,0.9);
+		opacity:.9;
+		border-left:5px solid rgba(0,0,0,0);
+		border-right:5px solid rgba(0,0,0,0);
+		border-radius:50px;
+		box-shadow: 0 0 15px #2187e7; 
+		width:30px;
+		height:30px;
+		margin:0 auto;
+		position:relative;
+		top:-50px;
+		-moz-animation:spinoffPulse 1s infinite linear;
+		-webkit-animation:spinoffPulse 1s infinite linear;
+	}
+
+	@-moz-keyframes spinPulse {
+		0% { -moz-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7;}
+		50% { -moz-transform:rotate(145deg); opacity:1; }
+		100% { -moz-transform:rotate(-320deg); opacity:0; }
+	}
+	@-moz-keyframes spinoffPulse {
+		0% { -moz-transform:rotate(0deg); }
+		100% { -moz-transform:rotate(360deg);  }
+	}
+	@-webkit-keyframes spinPulse {
+		0% { -webkit-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
+		50% { -webkit-transform:rotate(145deg); opacity:1;}
+		100% { -webkit-transform:rotate(-320deg); opacity:0; }
+	}
+	@-webkit-keyframes spinoffPulse {
+		0% { -webkit-transform:rotate(0deg); }
+		100% { -webkit-transform:rotate(360deg); }
+	}
+			</style>
+	</head>
+	
+	<body>
+		<!--Audio music-->
+		<audio id="bgSound_00" loop="loop">						
+			<source src="music/happy.mp3">
+		</audio>
+		<audio id="bgSound_01" loop="loop">						
+			<source src="music/qian.mp3">
+		</audio>
+	
+		<!-- take a photo -->
+		<div id="qrcode" style="margin:0 auto; width:256px; height:256px; background:white; display:none;"></div>
+		<script language="JavaScript">
+			function whetherHelp(id){
+				if(document.getElementById(id).style.display=='none'){ 
+					document.getElementById(id).style.display=''; 
+				}else{
+					document.getElementById(id).style.display='none'; 
+				}
+			}
+		</script>
+		<div id="scen1">								
+			<canvas id="vcanvas" width="640" height="480" style="position:absolute;left:360px;top:100px;width:640px;height:480px"></canvas>
+			<canvas id="boundary" width="640" height="480" style="position:absolute;left:360px;top:100px;width:640px;height:480px;opacity:0.2"></canvas>
+			<div style="position:absolute; left:315px; top:48px; width:730px; height:584px; background:url('images/gameView/frame.png')">
+				<div style="width:187px; height:93px; margin:0 auto;">
+					<img name="go" id="snap" src="images/gameView/go.png" style="margin-top:491px;" onmouseover="mouseOverGo();" onmouseout="mouseOutGo();" />
+				</div>
+			</div>	
+		</div>
+		
+		<!-- city day and night -->
+		
+		<section>
+		  <div id="st" class="stage">
+			<div class="nightOverlay"></div>
+			<div class="skyline"></div>
+			<div class="beans"></div>
+			<div class="ground back"></div>
+			<div class="ground mid"></div>
+			<div class="ground front"></div>
+			<div class="cloud large"></div>
+			<div class="cloud small"></div>
+			<div class="cloud medium"></div>
+			<div class="balloon"></div>
+			<div class="dowEventCenter"></div>
+			<div class="planetarium"></div>
+			<div class="friendshipShell"></div>
+			<div class="glockenspiel"></div>
+			<div class="rotation">
+			  <div class="sun"></div>
+			  <div class="moon"></div>
+			</div>
+		  </div>
+		</section>
+			
+		<!-- the result of facial expression recognition -->
+		<div id="scen2">
+			<canvas id="output" width="640" height="480" style="position:absolute;left:360px;top:100px;width:640px;height:480px"></canvas>		
+			<div style="position:absolute; left:315px; top:48px; width:730px; height:584px; background:url('images/gameView/frame.png')">
+				<div style="width:187px; height:93px; margin:0 auto;">
+					<img name="extract" id="extract" src="images/gameView/extract.png" style="margin-top:491px;" onmouseover="mouseOverExtract();" onmouseout="mouseOutExtract();" onclick="FACEMATRIX.extract.extractFace();" />
+				</div>
+			</div>	
+			<div id="result" style="position:absolute;left:0px;top:30px;width:90px;height:40px"></div>
+			<div id="result_mouth" style="position:absolute;left:0px;top:80px;width:90px;height:40px"></div>
+			
+			<div id="show">				
+				<canvas id="oval" width="640" height="480" style="position:absolute;left:360px;top:100px;width:640px;height:480px;opacity:0.9"></canvas>
+			</div>
+		</div>
+		
+		<!-- extract -->
+		<div id="scen3">
+			<div id="load" style="position:absolute; top:340px; left:680px; z-index:9999">
+				<div class="circle"></div>
+				<div class="circle1"></div>
+			</div>
+			<canvas id="finalCanvas" width="640" height="480" style="position:absolute;left:360px;top:100px;width:640px;height:480px;display:none;"></canvas>
+			<div id="options" style="background-color:dimGray; margin:150 auto; color:white; font-size:50px; padding:30 30 30 0; position:absolute;top:150px;
+				text-align:center; vertical-align:middle; width:100%; height:30%; font-family:幼圆; opacity:0.85">
+				<br>
+				根据表情进行游戏设置<br>
+				<span style="font-size:20px"></span><br>
+				<div id="eye2back" style="background-color:red; width:250px; padding:10px; font-size:23px; margin:auto"
+					onclick="eye2back()">
+				</div>
+				<div id="mouth2music" style="background-color:red; width:250px; padding:10px; font-size:23px; margin:auto"
+					onclick="mouth2music()">
+				</div>
+				<span style="font-size:20px"></span><br>
+				<span style="font-size:20px"></span><br>
+				<div style="width:187px; height:93px; margin:0 auto;">
+					<img name="prepare" id="prepare" src="images/gameView/prepare.png" onmouseover="mouseOverPrepare();" onmouseout="mouseOutPrepare();" onClick="reloadPic();" />
+				</div>
+			</div>
+		</div>
+		
+		<!-- intro -->
+		<div id="scen5">
+			<!--Introduction-->
+			<div id="intro" style="background-color:dimGray; margin:150 auto; color:white; font-size:50px; padding:30 30 30 0; position:absolute;top:150px;
+				text-align:center; vertical-align:middle; width:100%; height:30%; font-family:幼圆; opacity:0.85">
+				<br>
+				进入表情场景<br>
+				<span style="font-size:20px"></span><br>
+				<div id="goButton" style="background-color:red; width:150px; padding:10px; font-size:23px; margin:auto"
+					onclick="to3D()">
+					重力
+				</div>
+				<div id="goButton_01" style="background-color:red; width:150px; padding:10px; font-size:23px; margin:auto"
+					onclick="to3D_face()">
+					人脸
+				</div>
+			</div>
+		</div>
+
+		<!-- add 3D Scene -->
+		<div id="ThreeJS" style="position:absolute;left:0px;top:0px;"></div>
+		
+		<!-- face control -->	
+		<div id="scen4">
+			<canvas id="compare" width="320" height="240" style="display:none"></canvas>
+			<video id="video" autoplay loop width="320" height="240"></video>
+			<canvas id="control" width="320" height="240" style="opacity:0.5"></canvas>
+		</div>
+		
+		<!-- game element -->
+			<!-- tool -->
+			
+			<div id="jump" style="z-index:9999; display:none;">
+				<img name="getall" src="images/gameView/getAll.png" style="position:absolute; width:220px; left:114px; bottom:45px;" onmouseover="mouseOverGetAll();" onmouseout="mouseOutGetAll();" onclick="getAll();" />
+				<img name="jump" src="images/gameView/jump.png" style="position:absolute; left:0px; bottom:84px;" onmouseover="mouseOverJump();" onmouseout="mouseOutJump();" onclick="Jump();" />
+			</div>
+			<div id="findhelp" style="z-index:9999; display:none;">
+				<img name="findhelp" src="images/gameView/getHelp.png" style="position:absolute; left:0px; bottom:0px;" onmouseover="mouseOverFH();" onmouseout="mouseOutFH();" onclick="whetherHelp('qrcode');" />
+				<img name="run" src="images/gameView/run.png" style="position:absolute; width:160px; left:140px; bottom:0px;" onmouseover="mouseOverRun();" onmouseout="mouseOutRun();" onclick="stop();" />
+			</div>	
+			<div id="xray" style="z-index:9999; display:none;">
+				<img name="xray" src="images/gameView/xray.png" style="position:absolute; left:0px; bottom:153px;" onmouseover="mouseOverXray();" onmouseout="mouseOutXray();" onclick="XRay();" />				
+			</div>
+			<!--
+			<div id="getall" style="position:absolute; left:0px; bottom:400px;">
+				<button onclick="getAll();">getall</button>
+				<button onclick="stop();">stop</button>
+			</div>
+			-->
+			
+			<!-- the jigsaw pieces -->
+			<div id="jigsaw11" style="z-index:9999; display:none;">
+				<img id="testpic1"  style="position:absolute; left:45%; top:35%;" />
+			</div>
+			<div id="jigsaw12" style="z-index:9999; display:none;">
+				<img id="testpic2"  style="position:absolute; left:45%; top:35%;" />
+			</div>
+			<div id="jigsaw21" style="z-index:9999; display:none;">
+				<img id="testpic3"  style="position:absolute; left:45%; top:35%;" />
+			</div>
+			<div id="jigsaw22" style="z-index:9999; display:none;">
+				<img id="testpic4"  style="position:absolute; left:45%; top:35%;" />
+			</div>
+			
+			<!-- the jigsaws -->
+			<div id="jigsaw" style="z-index:9999; position:absolute; right:10px; bottom:10px; display:none;">
+				<img id="testpic"  style="position:absolute; right:0px; bottom:0px; width:320px; height:240px" />
+				<img id="cover11" name="jigCov11" src="jigsaw/jigsaw1.png" style="position:absolute; right:160px; bottom:0px; width:160px; height:240px" />
+				<img id="cover12" name="jigCov12" src="jigsaw/jigsaw4.png" style="position:absolute; right:160px; bottom:0px; width:160px; height:240px" />
+				<img id="cover21" name="jigCov21" src="jigsaw/jigsaw3.png" style="position:absolute; right:0px; bottom:0px; width:160px; height:240px" />
+				<img id="cover22" name="jigCov22" src="jigsaw/jigsaw2.png" style="position:absolute; right:0px; bottom:0px; width:160px; height:240px" />
+			</div>
+			
+			<!-- WIN -->
+			<div id="win" style="background-color:dimGray; margin:150 auto; color:white; font-size:50px; padding:30 30 30 0; position:absolute;top:150px;
+				text-align:center; vertical-align:middle; width:100%; height:30%; font-family:幼圆; opacity:0.85; display:none;">
+				<br>You Won！<br>	
+				<span style="font-size:20px"></span><br>
+				<div id="goButton" style="background-color:red; width:150px; padding:10px; font-size:23px; margin:auto"
+					onclick="lookGrade()">
+					look
+				</div>				
+			</div>
+			<div id="legend" style="position:absolute;left:360px;top:100px;width:640px;height:480px">
+				
+			</div>
+			<div id="grades" style="background-color:dimGray; margin:150 auto; color:white; font-size:40px; padding:30 30 30 0; position:absolute;top:180px;left:860px;
+				text-align:center; vertical-align:middle; width:30%; height:30%; font-family:幼圆; opacity:0.85;z-index:200;">
+				<br>
+				玩家分值<br>
+				<span style="font-size:20px"></span><br>
+				<div id="timeG" style="background-color:red; width:150px; padding:10px; font-size:23px; margin:auto">
+					时间
+				</div>
+				<div id="stepG" style="background-color:red; width:150px; padding:10px; font-size:23px; margin:auto">
+					步数
+				</div>
+				<div id="demG" style="background-color:red; width:150px; padding:10px; font-size:23px; margin:auto">
+					装饰度
+				</div>
+				<div id="feelG" style="background-color:red; width:150px; padding:10px; font-size:23px; margin:auto">
+					心情
+				</div>
+			</div>
+			<div id="newOne" style="background-color:dimGray; margin:150 auto; color:white; font-size:50px; padding:30 30 30 0; position:absolute;top:150px;
+				text-align:center; vertical-align:middle; width:100%; height:30%; font-family:幼圆; opacity:0.85">
+				<br>
+				a new one！<br>
+				<span style="font-size:20px"></span><br>
+				<div id="goButton" style="background-color:red; width:150px; padding:10px; font-size:23px; margin:auto"
+					onclick="hideNewOne()">
+					确定
+				</div>
+			</div>
+			<div id="leave" style="background-color:dimGray; margin:150 auto; color:white; font-size:50px; padding:30 30 30 0; position:absolute;top:150px;
+				text-align:center; vertical-align:middle; width:100%; height:30%; font-family:幼圆; opacity:0.85">
+				<br>
+				one left!<br>
+				<span style="font-size:20px"></span><br>
+				<div id="goButton" style="background-color:red; width:150px; padding:10px; font-size:23px; margin:auto"
+					onclick="hideLeave()">
+					确定
+				</div>
+			</div>
+			<script type="text/javascript">
+				$('#newOne').hide();
+				$('#leave').hide();
+				var roomid = 0;
+				var myDate = new Date();
+				roomid = myDate.getHours() + "" + myDate.getMinutes() + myDate.getSeconds() + parseInt(10*Math.random());
+				var address = window.location.href;
+				var address2="";
+				for(var i = 0; i < address.length - 10; i++)
+					address2 += address.charAt(i);
+				address2 += "indexRTC.html?roomid=" + roomid;
+				$('#qrcode').qrcode(address2);
+				function handleError(){
+				}
+				function hideNewOne(){
+					$('#newOne').hide();
+				}
+				function hideLeave(){
+					$('#leave').hide();
+				}
+				window.onerror = handleError;
+			</script>
+	</body>		
+</html>
